@@ -71,16 +71,22 @@ def siguientePoblacion(poblacion, cantidadMiembros) :
     print("seleccionados : ")
     for s in seleccionados :
         print(s)
+    
+    #CROSSOVER
     for i in range (seleccion//2): #valores posibles de i 0 y 1
         a = random.randint(1,100)
         if a <= PC*100:
             cambiados.extend(crossover(poblacion, seleccionados, i)) #arreglo de los nuevos cromosomas
             print(cambiados)
+    
+    #MUTACION
     for i in cambiados :
         a = random.randint(1,100)
         if a <= PM*100:
             cambiados.extend(mutacion(cambiados, i)) #arreglo de los nuevos cromosomas
             print(cambiados)
+    
+    #ARMADO DE NUEVA POBLACION
     while j < cantidadMiembros :
       valor = binarioToNumber(cambiados[j])
       suma = suma + valor
@@ -99,9 +105,7 @@ def siguientePoblacion(poblacion, cantidadMiembros) :
         miembros.append(Miembro(cromosoma, valor, suma))
     poblacion = Poblacion(miembros, max , min)
     poblacion.mostrar_miembros()
-            #Devuelve los modificados
-            # RECORDAR = Una vez terminado el bucle establecemos la suma y 
-            # lo actualizamos en la nueva poblacion
+
 
 def createPoblationInicial():
     a = []
@@ -170,7 +174,17 @@ createPoblationInicial()
 #2)
 # format(number, ‘05b’)
     #number es el numero que queremos cambiar el formato.
-    # ‘05b’ = 05 indica la cantidad de digitos a tener y b indica que es binario
+    # ‘05b’ = 05 - indica la cantidad de digitos a tener y b - indica que es binario
+
+#3)
+#''.join(str(digito) for digito in lista_binaria)
+#int(binario_str, 2)
+
+ #join() es una función de string en Python que se usa 
+ # para unir los elementos de una lista (u otra secuencia) en una sola cadena de texto.
+
+ #''.join(...)` une los números como una cadena binaria: `'10110'`.
+ #int(..., 2)` convierte esa cadena binaria a entero base 10.
 
 
 #CROSSOVER PASOS = 
