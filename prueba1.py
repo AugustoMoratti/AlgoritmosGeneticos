@@ -1,15 +1,22 @@
 import random
 
-def numBetween0_1() :
-    a = random.randint(0,1)
+def generacionDeCromosoma(tam):
+    a = []
+    for i in range(tam):
+        a.append(random.randint(0,1))
     return a
 
+# def numBetween0_1() :
+#     a = random.randint(0,1)
+#     return a
+
 def funcion(x):
-    a = x**2
+    coef = 2**30-1
+    a = (x/coef)**2
     return a
 
 def numberToBinario(number):
-    binario = format(number, '05b') #transforma a binario, 05 indica la cantidad de digitos en binario y la b que pasa a binario
+    binario = format(number, '30b') #transforma a binario, 05 indica la cantidad de digitos en binario y la b que pasa a binario
     return [int(digito) for digito in binario]
 
 def binarioToNumber(binario): #Convierte una lista de 1 y 0 (binario) a entero
@@ -39,17 +46,17 @@ class Miembro:
     def __init__(self, cromosoma, valor, suma):
           self.cromosoma = cromosoma
           self.valor = valor
-          self.funcionObjetivo = funcion(valor)
-          self.fitness = self.funcionObjetivo/suma
+          self.funcionObjetivo = round(funcion(valor),3)
+          self.fitness = round(self.funcionObjetivo/suma,2)
 
     def __str__(self):
         return f"Cromosoma: {self.cromosoma} Valor: {self.valor} FuncionObj: {self.funcionObjetivo} fitness: {self.fitness} "
 
 class Poblacion:
-    def __init__(self, miembros, max, min):
+    def __init__(self, miembros, posmax, posmin):
         self.miembros = miembros
-        self.max = max
-        self.min = min
+        self.posmax = posmax
+        self.posmin = posmin
 
     def ruleta(self, cantidad):
         seleccionados = random.choices(
@@ -65,11 +72,13 @@ class Poblacion:
     def mostrar_miembros(self):
         for miembro in self.miembros:
             print(miembro)
+        print('El cromosomas responsable del valor maximo ', self.miembros[self.posmax].funcionObjetivo, ' es ' , self.miembros[self.posmax])
+        print('El cromosomas responsable del valor minimo ', self.miembros[self.posmin].funcionObjetivo, ' es ' , self.miembros[self.posmin])
 
 
 def siguientePoblacion(poblacion, cantidadMiembros) :
-    PC = 0.20
-    PM = 0.001
+    PC = 0.75
+    PM = 0.05
     suma = 0
     miembros = []
     cambiados = [] #Arreglo de 4 cromosomas [1, 0 , 0, 1, 0]
@@ -108,37 +117,49 @@ def siguientePoblacion(poblacion, cantidadMiembros) :
             if max < valor :
                 max = valor
         miembros.append(Miembro(cromosoma, valor, suma))
-    p = Poblacion(miembros, max , min)
+    p = Poblacion(miembros, posmax , posmin)
     p.mostrar_miembros()
             #Devuelve los modificados  
             # RECORDAR = Una vez terminado el bucle establecemos la suma y 
             # lo actualizamos en la nueva poblacion
 
-def createPoblationInicial(cantidadMiembros): 
-    a = []  
+def createPoblationInicial(cantMiembros, tamCromo): 
     suma = 0
+    cromosomas = []
     miembros = []  
-    min = int
-    max = int
-    for i in range(cantidadMiembros) : 
-      a.append(random.randint(0 , 31)) #Hacer un for para armar arreglos de numeros binarios
-      #suma = suma + a[i]
-      suma = suma + funcion(a[i])
-    for y in range(cantidadMiembros):
-        cromosoma = numberToBinario(a[y])
-        valor = a[y]  #valor en decimal
-        if y == 0 :
-            min = valor
-            max = valor
-        if y >= 1 :
-            if min > valor : 
-                min = valor
-            if max < valor :
-                max = valor
-        miembros.append(Miembro(cromosoma, valor, suma))
-    p = Poblacion(miembros, max , min)
-    p.mostrar_miembros()
-    siguientePoblacion(p,cantidadMiembros)
+    acumFitness = 0
+    rest = 0.00
+    for i in range(cantMiembros) : 
+        crom = generacionDeCromosoma(tamCromo)
+        cromosomas.append(crom)
+        valor = binarioToNumber(cromosomas[i])
+        fObj = funcion(valor)
+        suma = suma + fObj
+        if i == 0 :
+            min = fObj
+            posmin = i
+            max = fObj
+            posmax = i
+        else :
+            if min > fObj : 
+                min = fObj
+                posmin = i
+            if max < fObj :
+                max = fObj
+                posmax = i
+    for y in range(cantMiembros):
+        valor = binarioToNumber(cromosomas[y])
+        miembros.append(Miembro(cromosomas[y], valor, suma))
+        acumFitness = acumFitness + miembros[y].fitness
+    print(y)
+    if acumFitness != 1.00:
+        rest = round(1.00 - acumFitness, 2)
+        miembros[y].fitness = round(miembros[y].fitness + rest, 2)
+    pob0 = Poblacion(miembros, posmax , posmin)
+    print('Los miembros de la población inicial son:')
+    pob0.mostrar_miembros()
+    return pob0
+    #siguientePoblacion(p,cantMiembros)
     #al ponerlo dentro de un bucle controlaremos las iteraciones / ver donde ponerlo 
 
     #OPCION PERO CON ELEMENTOS SIN REPETIR
@@ -166,7 +187,8 @@ def createPoblationInicial(cantidadMiembros):
     # Para tener 10 numeros distintos sin repeticion
     """
 
-createPoblationInicial(4)
+pob = createPoblationInicial(10,30) #se ingresa numero deseado de integrantes de la población y numero de bits por cromosoma
+#siguientePoblacion(pob,10)
 
 #ALGUNAS FUNCIONES EXPLICADAS
 
