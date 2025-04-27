@@ -178,8 +178,6 @@ def createPoblationInicial(cantMiembros, tamCromo):
     print('Los miembros de la población inicial son:')
     pob0.mostrar_miembros()
     return pob0
-    #siguientePoblacion(p,cantMiembros)
-    #al ponerlo dentro de un bucle controlaremos las iteraciones / ver donde ponerlo 
 
     #OPCION PERO CON ELEMENTOS SIN REPETIR
     """
