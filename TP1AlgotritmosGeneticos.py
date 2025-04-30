@@ -180,7 +180,7 @@ def createPoblationInicial(cantMiembros, tamCromo):
     pob = Poblacion(miembros, cromosomas[posmax], max, min, suma/cantMiembros)
     minGlobales.append(min)
     maxGlobales.append(max)
-    promGlobales.append(suma/tamCromo)
+    promGlobales.append(suma/cantMiembros)
     print('Los miembros de la población inicial son:')
     pob.mostrar_miembros()
     print(" POBLACIÓN : CROMOSOMA CORRESPONDIENTE A VALOR MÁXIMO                                                    : MAX    : MIN    : PROM ") 
