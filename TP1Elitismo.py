@@ -1,5 +1,5 @@
 import random
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt #Para instalar poner en la terminal : pip install matplotlib
 
 
 def generacionDeCromosoma(tam):
