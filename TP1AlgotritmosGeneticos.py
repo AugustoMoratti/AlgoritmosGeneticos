@@ -139,7 +139,7 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo) :
     if acumFitness != 1.00:
         rest = round(1.00 - acumFitness, 2)
         miembros[y].fitness = round(miembros[y].fitness + rest, 2)
-    pob = Poblacion(miembros, cambiados[posmax], max, min, suma/tamCromo)
+    pob = Poblacion(miembros, cambiados[posmax], max, min, suma/cantMiembros) #El promedio es suma/cantMiembros (estaba mal antes, suma/tamCromo)
     #print('Los miembros de la población y son:') #FALTA AGREGAR EL NUMERO DE LA ITERACION QUE VIENE DE AFUERA
     #pob.mostrar_miembros()
     pob.mostrarPoblacion(2)
@@ -177,7 +177,7 @@ def createPoblationInicial(cantMiembros, tamCromo):
     if acumFitness != 1.00:
         rest = round(1.00 - acumFitness, 2)
         miembros[y].fitness = round(miembros[y].fitness + rest, 2)
-    pob = Poblacion(miembros, cromosomas[posmax], max, min, suma/tamCromo)
+    pob = Poblacion(miembros, cromosomas[posmax], max, min, suma/cantMiembros)
     minGlobales.append(min)
     maxGlobales.append(max)
     promGlobales.append(suma/tamCromo)

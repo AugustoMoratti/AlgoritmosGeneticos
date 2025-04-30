@@ -1,4 +1,6 @@
 import random
+import matplotlib.pyplot as plt
+
 
 def generacionDeCromosoma(tam):
     a = []
@@ -94,7 +96,12 @@ class Poblacion:
     def mostrarPoblacion(self, num):
         print(num, "       : ", self.crommax," : ", self.max," : ", self.min," : ", self.prom)
 
-def siguientePoblacion(poblacion, cantMiembros, tamCromo, iteraciones) :
+def siguientePoblacion(poblacion, cantMiembros, tamanioDelCromosoma, iteraciones) :
+    valoresMaximos = {}
+    valoresPromedios = []
+    valoresMinimos = []
+    poblaciones = [poblacion]
+
     for iteracion in range(iteraciones-1) :
         PC = 0.75
         PM = 0.05
@@ -110,7 +117,7 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo, iteraciones) :
             cross = random.randint(1,100)
             #print("probabilidad de crossover en ",i, " :",cross)
             if cross <= PC*100:
-                cambiados.extend(crossover(seleccionados, i, tamCromo)) #arreglo de los nuevos cromosomas
+                cambiados.extend(crossover(seleccionados, i, tamanioDelCromosoma)) #arreglo de los nuevos cromosomas
             else :
                 arregloProvisorio = [seleccionados[i*2].cromosoma , seleccionados[(i*2)+1].cromosoma]
                 cambiados.extend(arregloProvisorio)
@@ -118,7 +125,7 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo, iteraciones) :
             muta = random.randint(1,100)
             #print("probabilidad de mutacion en ",i, " :",muta)
             if muta <= PM*100:
-                cambiados[i] = (mutacion(cambiados, i, tamCromo))
+                cambiados[i] = (mutacion(cambiados, i, tamanioDelCromosoma))
         for i in range(cantMiembros) :
             valor = binarioToNumber(cambiados[i])
             fObj = funcion(valor)
@@ -141,14 +148,49 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo, iteraciones) :
         if acumFitness != 1.00:
             rest = round(1.00 - acumFitness, 2)
             miembros[y].fitness = round(miembros[y].fitness + rest, 2)
-        pob = Poblacion(miembros, cambiados[posmax], max, min, suma/tamCromo)
+        pob = Poblacion(miembros, cambiados[posmax], max, min, suma/cantMiembros) #Modifique que aca antes hacia suma/cantCromo y es dividido la cantMiembros
+        poblaciones.append(pob)
+        if iteracion == 19 : 
+            for i in range(20) :
+                valoresMaximos[i] = poblaciones[i].max
+                valoresMinimos.append(poblaciones[i].min)
+                valoresPromedios.append(poblaciones[i].prom)
+            key = list(valoresMaximos.keys())
+            maximos = list(valoresMaximos.values())
+            plt.subplot(1, 3, 1) #Para no tener que cerrar ventana por ventana, asi poder ver todos los graficos al instante
+            plt.plot(key, maximos)
+            plt.title('Valor máximo por iteración')
+            plt.xlabel('Iteración')
+            plt.ylabel('Valor del mejor miembro')
+            plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
+
+
+            plt.subplot(1, 3, 2)
+            plt.plot(key, valoresMinimos)
+            plt.title('Valor minimo por iteración')
+            plt.xlabel('Iteración')
+            plt.ylabel('Valor del menor miembro')
+            plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
+
+
+            plt.subplot(1, 3, 3)
+            plt.plot(key, valoresPromedios)
+            plt.title('Valor promedio por iteración')
+            plt.xlabel('Iteración')
+            plt.ylabel('Valor del miembro promedio')
+            plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
+
+            plt.tight_layout()
+            plt.show()
+
+
         pob.mostrarPoblacion(iteracion+2)
     #print('Los miembros de la población y son:') #FALTA AGREGAR EL NUMERO DE LA ITERACION QUE VIENE DE AFUERA
     #pob.mostrar_miembros()
     return pob
 
 
-def createPoblationInicial(cantMiembros, tamCromo): 
+def createPoblationInicial(cantMiembros, tamanioDelCromo): 
     suma = 0
     cromosomas = []
     miembros = []  
@@ -156,7 +198,7 @@ def createPoblationInicial(cantMiembros, tamCromo):
     rest = 0.00
 
     for i in range(cantMiembros) : 
-        crom = generacionDeCromosoma(tamCromo)
+        crom = generacionDeCromosoma(tamanioDelCromo)
         cromosomas.append(crom)
         valor = binarioToNumber(cromosomas[i])
         fObj = funcion(valor)
@@ -179,7 +221,7 @@ def createPoblationInicial(cantMiembros, tamCromo):
     if acumFitness != 1.00:
         rest = round(1.00 - acumFitness, 2)
         miembros[y].fitness = round(miembros[y].fitness + rest, 2)
-    pob = Poblacion(miembros, cromosomas[posmax], max, min, suma/tamCromo)
+    pob = Poblacion(miembros, cromosomas[posmax], max, min, suma/cantMiembros)
     minGlobales.append(min)
     maxGlobales.append(max)
     promGlobales.append(suma/tamCromo)
