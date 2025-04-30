@@ -26,17 +26,17 @@ def torneo(iteraciones, poblacion):
 
 def mutacion(seleccionados, i, tam):
     cromo = seleccionados[i]
-    for j in range(tam):
-        if cromo[j] == 0:
-            cromo[j] = 1
-        else :
-            cromo[j] = 0
+    pos = random.randint(0,tam-1)
+    if cromo[pos] == 0:
+        cromo[pos] = 1
+    else :
+            cromo[pos] = 0
 
 
-def crossover(seleccionados, i):
-    n = random.randint(0,29)
-    print("n crossover :")
-    print(n)
+def crossover(seleccionados, i, tam):
+    n = random.randint(0,tam-1)
+    #print("n crossover :")
+    #print(n)
     elemento1 = seleccionados[i*2]
     elemento2 = seleccionados[(i*2)+1]
     elemento3 = elemento1.cromosoma[:n] + elemento2.cromosoma[n:]#devuelve el cromosoma cambiado
@@ -56,11 +56,13 @@ class Miembro:
         return f"Cromosoma: {self.cromosoma} Valor: {self.valor} FuncionObj: {self.funcionObjetivo} fitness: {self.fitness} "
 
 class Poblacion:
-    def __init__(self, miembros, posmax, posmin):
+    def __init__(self, miembros, cromMax, max, min, promedio):
         self.miembros = miembros
-        self.posmax = posmax
-        self.posmin = posmin
-
+        self.crommax = cromMax
+        self.max = round(max, 3)
+        self.min = round(min, 3)
+        self.prom = round(promedio, 3)
+        
     def ruleta(self, cantidad):
         roulette = []
         elegidos = [] 
@@ -68,13 +70,12 @@ class Poblacion:
             cantPos = self.miembros[j].fitness
             for k in range(int(cantPos*100)):
                 roulette.append(self.miembros[j].valor)
-        # for a in range(100):
-        #     print(a+1, " : ", roulette[a])    para ver ruleta
+        #print("RULETA: ",roulette)
         if len(roulette)!=100:
             print("ERROR: CANTIDAD DE POSICIONES DE RULETA ERRONEA")
         for i in range(cantidad):
             pos = random.randint(0,99)
-            #print (pos)
+            #print ("elegido: ",roulette[pos])
             val = roulette[pos]
             j = 0
             while self.miembros[j].valor != val:
@@ -86,9 +87,11 @@ class Poblacion:
     def mostrar_miembros(self):
         for miembro in self.miembros:
             print(miembro)
-        print('El cromosomas responsable del valor maximo ', self.miembros[self.posmax].funcionObjetivo, ' es ' , self.miembros[self.posmax])
-        print('El cromosomas responsable del valor minimo ', self.miembros[self.posmin].funcionObjetivo, ' es ' , self.miembros[self.posmin])
+        #print('El cromosomas responsable del valor maximo ', self.miembros[self.posmax].funcionObjetivo, ' es ' , self.miembros[self.posmax])
+        #print('El cromosomas responsable del valor minimo ', self.miembros[self.posmin].funcionObjetivo, ' es ' , self.miembros[self.posmin])
 
+    def mostrarPoblacion(self, num):
+        print(num, "       : ", self.crommax," : ", self.max," : ", self.min," : ", self.prom)
 
 def siguientePoblacion(poblacion, cantMiembros, tamCromo) :
     PC = 0.75
@@ -98,19 +101,20 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo) :
     miembros = []
     cambiados = [] 
     seleccionados = poblacion.ruleta(cantMiembros)
-    # print("seleccionados : ")
-    # for s in seleccionados :
-    #     print(s)
+    #print("CROMOSOMAS SELECCIONADOS: ")
+    #for i in range(cantMiembros):
+        #print(seleccionados[i])
     for i in range (cantMiembros//2): #valores posibles de i 0 y 1
         cross = random.randint(1,100)
-        print("probabilidad de crossover :",cross)
+        #print("probabilidad de crossover en ",i, " :",cross)
         if cross <= PC*100:
-            cambiados.extend(crossover(seleccionados, i)) #arreglo de los nuevos cromosomas
+            cambiados.extend(crossover(seleccionados, i, tamCromo)) #arreglo de los nuevos cromosomas
         else :
             arregloProvisorio = [seleccionados[i*2].cromosoma , seleccionados[(i*2)+1].cromosoma]
             cambiados.extend(arregloProvisorio)
     for i in range(cantMiembros):
         muta = random.randint(1,100)
+        #print("probabilidad de mutacion en ",i, " :",muta)
         if muta <= PM*100:
             cambiados[i] = (mutacion(cambiados, i, tamCromo))
     for i in range(cantMiembros) :
@@ -119,13 +123,12 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo) :
         suma = suma + fObj
         if i == 0 :
             min = fObj
-            posmin = i
             max = fObj
             posmax = i
         else :
             if min > fObj : 
                 min = fObj
-                posmin = i
+
             if max < fObj :
                 max = fObj
                 posmax = i
@@ -136,9 +139,10 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo) :
     if acumFitness != 1.00:
         rest = round(1.00 - acumFitness, 2)
         miembros[y].fitness = round(miembros[y].fitness + rest, 2)
-    pob = Poblacion(miembros, posmax , posmin)
-    print('Los miembros de la población y son:') #FALTA AGREGAR EL NUMERO DE LA ITERACION QUE VIENE DE AFUERA
-    pob.mostrar_miembros()
+    pob = Poblacion(miembros, cambiados[posmax], max, min, suma/tamCromo)
+    #print('Los miembros de la población y son:') #FALTA AGREGAR EL NUMERO DE LA ITERACION QUE VIENE DE AFUERA
+    #pob.mostrar_miembros()
+    pob.mostrarPoblacion(2)
     return pob
 
 
@@ -163,7 +167,6 @@ def createPoblationInicial(cantMiembros, tamCromo):
         else :
             if min > fObj : 
                 min = fObj
-                posmin = i
             if max < fObj :
                 max = fObj
                 posmax = i
@@ -174,38 +177,20 @@ def createPoblationInicial(cantMiembros, tamCromo):
     if acumFitness != 1.00:
         rest = round(1.00 - acumFitness, 2)
         miembros[y].fitness = round(miembros[y].fitness + rest, 2)
-    pob0 = Poblacion(miembros, posmax , posmin)
+    pob = Poblacion(miembros, cromosomas[posmax], max, min, suma/tamCromo)
+    minGlobales.append(min)
+    maxGlobales.append(max)
+    promGlobales.append(suma/tamCromo)
     print('Los miembros de la población inicial son:')
-    pob0.mostrar_miembros()
-    return pob0
+    pob.mostrar_miembros()
+    print(" POBLACIÓN : CROMOSOMA CORRESPONDIENTE A VALOR MÁXIMO                                                    : MAX    : MIN    : PROM ") 
+    pob.mostrarPoblacion(1)
+    return pob
 
-    #OPCION PERO CON ELEMENTOS SIN REPETIR
-    """
-    suma = 0
-    miembros = []
-    conjunto = list(range(0, 31))  # Conjunto del 0 al 31
-    arreglo = random.sample(conjunto, 10)  # Selecciona 10 números sin repetir
-    for i in range(10) :
-        cromosoma = numberToBinario(arreglo[i])
-        valor = arreglo[i]
-        suma = suma + arreglo[i]
-        if i == 1 :
-            min = valor
-            max = valor
-        if i > 1 :
-            if min > valor : 
-                min = valor
-            if max < valor :
-                max = valor
-        miembros.append(Miembro(cromosoma, valor, suma))
-    p = Poblacion(miembros, max , min)
-    p.mostrar_miembros()
-    siguientePoblacion(p) #al ponerlo dentro de un bucle controlaremos las iteraciones   
-    # Para tener 10 numeros distintos sin repeticion
-    """
-
+minGlobales = []
+maxGlobales = []
+promGlobales = []
 population = createPoblationInicial(10,30) #se ingresa numero deseado de integrantes de la población y numero de bits por cromosoma
-
 population = siguientePoblacion(population,10,30)
 
 #ALGUNAS FUNCIONES EXPLICADAS
@@ -242,3 +227,29 @@ population = siguientePoblacion(population,10,30)
 #CONSULTA =
 # Puede pasar que en la poblacion haya un elemento repetido?
 # Como puedo mantener siempre la misma cantidad de elementos en la poblacion
+
+    #OPCION PERO CON ELEMENTOS SIN REPETIR
+"""
+    suma = 0
+    miembros = []
+    conjunto = list(range(0, 31))  # Conjunto del 0 al 31
+    arreglo = random.sample(conjunto, 10)  # Selecciona 10 números sin repetir
+    for i in range(10) :
+        cromosoma = numberToBinario(arreglo[i])
+        valor = arreglo[i]
+        suma = suma + arreglo[i]
+        if i == 1 :
+            min = valor
+            max = valor
+        if i > 1 :
+            if min > valor : 
+                min = valor
+            if max < valor :
+                max = valor
+        miembros.append(Miembro(cromosoma, valor, suma))
+    p = Poblacion(miembros, max , min)
+    p.mostrar_miembros()
+    siguientePoblacion(p) #al ponerlo dentro de un bucle controlaremos las iteraciones   
+    # Para tener 10 numeros distintos sin repeticion
+    """
+
