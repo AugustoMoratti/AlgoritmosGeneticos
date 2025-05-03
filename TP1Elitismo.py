@@ -42,11 +42,11 @@ def crossover(seleccionados, i, tam):
     #print(n)
     elemento1 = seleccionados[i*2]
     elemento2 = seleccionados[(i*2)+1]
-    elemento3 = elemento1.cromosoma[:n] + elemento2.cromosoma[n:]#devuelve el cromosoma cambiado
-    elemento4 = elemento2.cromosoma[:n] + elemento1.cromosoma[n:]#devuelve el cromosoma cambiado
+    elemento3 = elemento1[:n] + elemento2[n:]#devuelve el cromosoma cambiado
+    elemento4 = elemento2[:n] + elemento1[n:]#devuelve el cromosoma cambiado
     #print(elemento3)
     #print(elemento4)
-    return [elemento3, elemento4]
+    return [elemento3, elemento4]                    
 
 class Miembro:
     def __init__(self, cromosoma, valor, suma):
@@ -73,17 +73,19 @@ class Poblacion:
             cantPos = self.miembros[j].fitness
             for k in range(int(cantPos*100)):
                 roulette.append(self.miembros[j].valor)
-        #print("RULETA: ",roulette)
+        # print("RULETA: ")
+        # for i in range(len(roulette)):
+        #     print(i+1,roulette[i])
         if len(roulette)!=100:
             print("ERROR: CANTIDAD DE POSICIONES DE RULETA ERRONEA")
-        for i in range(cantidad):
+        for i in range(cantidad-2):
             pos = random.randint(0,99)
             #print ("elegido: ",roulette[pos])
             val = roulette[pos]
             j = 0
             while self.miembros[j].valor != val:
                 j = j + 1
-            elegidos.append(self.miembros[j])
+            elegidos.append(self.miembros[j].cromosoma)
         return elegidos
 
 
@@ -96,95 +98,110 @@ class Poblacion:
     def mostrarPoblacion(self, num):
         print(num, "       : ", self.crommax," : ", self.max," : ", self.min," : ", self.prom)
 
-def siguientePoblacion(poblacion, cantMiembros, tamanioDelCromosoma, iteraciones) :
-    valoresMaximos = {}
-    valoresPromedios = []
-    valoresMinimos = []
-    poblaciones = [poblacion]
-
-    for iteracion in range(iteraciones-1) :
-        PC = 0.75
-        PM = 0.05
-        suma = 0
-        acumFitness = 0
-        miembros = []
-        cambiados = [] 
-        seleccionados = poblacion.ruleta(cantMiembros)
-        #print("CROMOSOMAS SELECCIONADOS: ")
-        #for i in range(cantMiembros):
-            #print(seleccionados[i])
-        for i in range (cantMiembros//2): #valores posibles de i 0 y 1
-            cross = random.randint(1,100)
-            #print("probabilidad de crossover en ",i, " :",cross)
-            if cross <= PC*100:
-                cambiados.extend(crossover(seleccionados, i, tamanioDelCromosoma)) #arreglo de los nuevos cromosomas
-            else :
-                arregloProvisorio = [seleccionados[i*2].cromosoma , seleccionados[(i*2)+1].cromosoma]
-                cambiados.extend(arregloProvisorio)
-        for i in range(cantMiembros):
-            muta = random.randint(1,100)
-            #print("probabilidad de mutacion en ",i, " :",muta)
-            if muta <= PM*100:
-                cambiados[i] = (mutacion(cambiados, i, tamanioDelCromosoma))
-        for i in range(cantMiembros) :
-            valor = binarioToNumber(cambiados[i])
-            fObj = funcion(valor)
-            suma = suma + fObj
+    def elitismo(self, cant):
+        for i in range(cant):
+            fObj = self.miembros[i].funcionObjetivo
             if i == 0 :
+                max1 = fObj
+                posmax1 = i
+                max2 = fObj
+                posmax2 = i
+            else :
+                if max1 < fObj : 
+                    max2 = max1
+                    posmax2 = posmax1
+                    max1 = fObj
+                    posmax1 = i
+        #print('ELITISMO: ',self.miembros[posmax1].cromosoma,self.miembros[posmax2].cromosoma)
+        return [self.miembros[posmax1].cromosoma,self.miembros[posmax2].cromosoma]
+
+
+def siguientePoblacion(poblacion, cantMiembros, tamanioDelCromosoma, numCorr) :
+    PC = 0.75
+    PM = 0.05
+    suma = 0
+    acumFitness = 0
+    miembros = []
+    cambiados = [] 
+    seleccionados = []
+    mejores = poblacion.elitismo(cantMiembros)
+    seleccionados.extend(mejores)
+    seleccionados.extend(poblacion.ruleta(cantMiembros))
+    cambiados.extend(mejores)
+    # print("CROMOSOMAS SELECCIONADOS ELITISMO: ")
+    # for i in range(cantMiembros):
+    #     print(seleccionados[i])
+    # for i in range(2):
+    # cambiados.extend(elitismo(seleccionados, cantMiembros))
+    for i in range (1,cantMiembros//2): #valores posibles de i 0 y 1
+        cross = random.randint(1,100)
+        #print("probabilidad de crossover en ",i, " :",cross)
+        if cross <= PC*100:
+            cambiados.extend(crossover(seleccionados, i, tamanioDelCromosoma)) #arreglo de los nuevos cromosomas
+        else :
+            arregloProvisorio = [seleccionados[i*2] , seleccionados[(i*2)+1]]
+            cambiados.extend(arregloProvisorio)
+    for i in range(2,cantMiembros):
+        muta = random.randint(1,100)
+        #print("probabilidad de mutacion en ",i, " :",muta)
+        if muta <= PM*100:
+            cambiados[i] = (mutacion(cambiados, i, tamanioDelCromosoma))
+    for i in range(cantMiembros) :
+        valor = binarioToNumber(cambiados[i])
+        fObj = funcion(valor)
+        suma = suma + fObj
+        if i == 0 :
+            min = fObj
+            max = fObj
+            posmax = i
+        else :
+            if min > fObj : 
                 min = fObj
+            if max < fObj :
                 max = fObj
                 posmax = i
-            else :
-                if min > fObj : 
-                    min = fObj
-
-                if max < fObj :
-                    max = fObj
-                    posmax = i
-        for y in range(cantMiembros):
-            valor = binarioToNumber(cambiados[y])
-            miembros.append(Miembro(cambiados[y], valor, suma))
-            acumFitness = acumFitness + miembros[y].fitness
-        if acumFitness != 1.00:
-            rest = round(1.00 - acumFitness, 2)
-            miembros[y].fitness = round(miembros[y].fitness + rest, 2)
-        pob = Poblacion(miembros, cambiados[posmax], max, min, suma/cantMiembros) #Modifique que aca antes hacia suma/cantCromo y es dividido la cantMiembros
-        poblaciones.append(pob)
-        if iteracion == 19 : 
-            for i in range(20) :
-                valoresMaximos[i] = poblaciones[i].max
-                valoresMinimos.append(poblaciones[i].min)
-                valoresPromedios.append(poblaciones[i].prom)
-            key = list(valoresMaximos.keys())
-            maximos = list(valoresMaximos.values())
-            plt.subplot(1, 3, 1) #Para no tener que cerrar ventana por ventana, asi poder ver todos los graficos al instante
-            plt.plot(key, maximos)
-            plt.title('Valor máximo por iteración')
-            plt.xlabel('Iteración')
-            plt.ylabel('Valor del mejor miembro')
-            plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
+    for y in range(cantMiembros):
+        valor = binarioToNumber(cambiados[y])
+        miembros.append(Miembro(cambiados[y], valor, suma))
+        acumFitness = acumFitness + miembros[y].fitness
+    if acumFitness != 1.00:
+        rest = round(1.00 - acumFitness, 2)
+        miembros[y].fitness = round(miembros[y].fitness + rest, 2)
+    pob = Poblacion(miembros, cambiados[posmax], max, min, suma/cantMiembros) #Modifique que aca antes hacia suma/cantCromo y es dividido la cantMiembros
+    minGlobales.append(min)
+    maxGlobales.append(max)
+    promGlobales.append(suma/cantMiembros)
+    pob.mostrarPoblacion(numCorr)
+    if numCorr  == 20 : 
+        x = list(range(len(maxGlobales)))
+        # key = list(valoresMaximos.keys())
+        # maximos = list(valoresMaximos.values())
+        plt.subplot(1, 3, 1) #Para no tener que cerrar ventana por ventana, asi poder ver todos los graficos al instante
+        plt.plot(x, maxGlobales)
+        plt.title('Valor máximo por iteración')
+        plt.xlabel('Iteración')
+        plt.ylabel('Valor del mejor miembro')
+        plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
 
 
-            plt.subplot(1, 3, 2)
-            plt.plot(key, valoresMinimos)
-            plt.title('Valor minimo por iteración')
-            plt.xlabel('Iteración')
-            plt.ylabel('Valor del menor miembro')
-            plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
+        plt.subplot(1, 3, 2)
+        plt.plot(x, minGlobales)
+        plt.title('Valor minimo por iteración')
+        plt.xlabel('Iteración')
+        plt.ylabel('Valor del menor miembro')
+        plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
 
 
-            plt.subplot(1, 3, 3)
-            plt.plot(key, valoresPromedios)
-            plt.title('Valor promedio por iteración')
-            plt.xlabel('Iteración')
-            plt.ylabel('Valor del miembro promedio')
-            plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
+        plt.subplot(1, 3, 3)
+        plt.plot(x, promGlobales)
+        plt.title('Valor promedio por iteración')
+        plt.xlabel('Iteración')
+        plt.ylabel('Valor del miembro promedio')
+        plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
 
-            plt.tight_layout()
-            plt.show()
+        plt.tight_layout()
+        plt.show()
 
-
-        pob.mostrarPoblacion(iteracion+2)
     #print('Los miembros de la población y son:') #FALTA AGREGAR EL NUMERO DE LA ITERACION QUE VIENE DE AFUERA
     #pob.mostrar_miembros()
     return pob
@@ -205,7 +222,6 @@ def createPoblationInicial(cantMiembros, tamanioDelCromo):
         suma = suma + fObj
         if i == 0 :
             min = fObj
-            posmin = i
             max = fObj
             posmax = i
         else :
@@ -231,11 +247,14 @@ def createPoblationInicial(cantMiembros, tamanioDelCromo):
     pob.mostrarPoblacion(1)
     return pob
 
+
 minGlobales = []
 maxGlobales = []
 promGlobales = []
+corridas = 20
 population = createPoblationInicial(10,30) #se ingresa numero deseado de integrantes de la población y numero de bits por cromosoma
-population = siguientePoblacion(population,10,30, 200)
+for c in range(corridas-1):
+    population = siguientePoblacion(population,10,30, c+2)
 
 #ALGUNAS FUNCIONES EXPLICADAS
 

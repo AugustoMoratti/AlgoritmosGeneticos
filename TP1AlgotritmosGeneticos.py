@@ -1,4 +1,5 @@
 import random
+import matplotlib.pyplot as plt
 
 def generacionDeCromosoma(tam):
     a = []
@@ -13,12 +14,23 @@ def funcion(x):
     return a
 
 def numberToBinario(number):
-    binario = format(number, '30b') #transforma a binario, 05 indica la cantidad de digitos en binario y la b que pasa a binario
-    return [int(digito) for digito in binario]
+    binario = []
+    while number != 0:
+        resto = number % 2
+        number = number // 2
+        binario.append(resto)
+    if len(binario)!=30:
+        for i in range(30-len(binario)):
+            binario.append(0)
+    crom = binario[::-1]
+    return crom
 
 def binarioToNumber(binario): #Convierte una lista de 1 y 0 (binario) a entero
-    binario_str = ''.join(str(digito) for digito in binario)  #Es lo que se pondra entre los elementos
-    return int(binario_str, 2)
+    cromI = binario[::-1]
+    decimal = 0
+    for i in range(len(cromI)):
+        decimal = decimal + cromI[i] * (2**i)
+    return decimal
 
 def torneo(iteraciones, poblacion):
     ...
@@ -31,7 +43,7 @@ def mutacion(seleccionados, i, tam):
         cromo[pos] = 1
     else :
             cromo[pos] = 0
-
+    return cromo
 
 def crossover(seleccionados, i, tam):
     n = random.randint(0,tam-1)
@@ -93,45 +105,49 @@ class Poblacion:
     def mostrarPoblacion(self, num):
         print(num, "       : ", self.crommax," : ", self.max," : ", self.min," : ", self.prom)
 
-def siguientePoblacion(poblacion, cantMiembros, tamCromo) :
+def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr) :
     PC = 0.75
     PM = 0.05
     suma = 0
     acumFitness = 0
+    fObj = 0
     miembros = []
     cambiados = [] 
     seleccionados = poblacion.ruleta(cantMiembros)
-    #print("CROMOSOMAS SELECCIONADOS: ")
-    #for i in range(cantMiembros):
-        #print(seleccionados[i])
-    for i in range (cantMiembros//2): #valores posibles de i 0 y 1
+    # print("CROMOSOMAS SELECCIONADOS: ")
+    # for i in range(cantMiembros):
+    #     print(seleccionados[i])
+    for i in range (cantMiembros//2): # la division // devuelve numero entero, mientras que / devuelve flotante
         cross = random.randint(1,100)
-        #print("probabilidad de crossover en ",i, " :",cross)
+        print("probabilidad de crossover en ",i, " :",cross)
         if cross <= PC*100:
             cambiados.extend(crossover(seleccionados, i, tamCromo)) #arreglo de los nuevos cromosomas
         else :
             arregloProvisorio = [seleccionados[i*2].cromosoma , seleccionados[(i*2)+1].cromosoma]
             cambiados.extend(arregloProvisorio)
-    for i in range(cantMiembros):
+        print('COLECCION DE CAMBIADOS ', i, cambiados)
+    for j in range(cantMiembros):
         muta = random.randint(1,100)
-        #print("probabilidad de mutacion en ",i, " :",muta)
+        #print("probabilidad de mutacion en ",j, " :",muta)
         if muta <= PM*100:
-            cambiados[i] = (mutacion(cambiados, i, tamCromo))
-    for i in range(cantMiembros) :
-        valor = binarioToNumber(cambiados[i])
+            cambiados[j] = (mutacion(cambiados, j, tamCromo))
+    #     print('COLECCION DE CAMBIADOS ', j, cambiados)
+    # print(cambiados)
+    for k in range(cantMiembros) :
+        valor = binarioToNumber(cambiados[k])
         fObj = funcion(valor)
         suma = suma + fObj
-        if i == 0 :
+        if k == 0 :
             min = fObj
             max = fObj
-            posmax = i
+            posmax = k
         else :
             if min > fObj : 
                 min = fObj
 
             if max < fObj :
                 max = fObj
-                posmax = i
+                posmax = k
     for y in range(cantMiembros):
         valor = binarioToNumber(cambiados[y])
         miembros.append(Miembro(cambiados[y], valor, suma))
@@ -140,9 +156,13 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo) :
         rest = round(1.00 - acumFitness, 2)
         miembros[y].fitness = round(miembros[y].fitness + rest, 2)
     pob = Poblacion(miembros, cambiados[posmax], max, min, suma/cantMiembros) #El promedio es suma/cantMiembros (estaba mal antes, suma/tamCromo)
-    #print('Los miembros de la población y son:') #FALTA AGREGAR EL NUMERO DE LA ITERACION QUE VIENE DE AFUERA
-    #pob.mostrar_miembros()
-    pob.mostrarPoblacion(2)
+    minGlobales.append(min)
+    maxGlobales.append(max)
+    promGlobales.append(suma/cantMiembros)
+    # print('Los miembros de la población ', numCorr,' son:') #FALTA AGREGAR EL NUMERO DE LA ITERACION QUE VIENE DE AFUERA
+    # pob.mostrar_miembros()
+    # print(" POBLACIÓN : CROMOSOMA CORRESPONDIENTE A VALOR MÁXIMO                                                    : MAX    : MIN    : PROM ") 
+    pob.mostrarPoblacion(numCorr)
     return pob
 
 
@@ -161,7 +181,6 @@ def createPoblationInicial(cantMiembros, tamCromo):
         suma = suma + fObj
         if i == 0 :
             min = fObj
-            posmin = i
             max = fObj
             posmax = i
         else :
@@ -190,8 +209,35 @@ def createPoblationInicial(cantMiembros, tamCromo):
 minGlobales = []
 maxGlobales = []
 promGlobales = []
+corridas = 20
 population = createPoblationInicial(10,30) #se ingresa numero deseado de integrantes de la población y numero de bits por cromosoma
-population = siguientePoblacion(population,10,30)
+for c in range(corridas-1):
+    population = siguientePoblacion(population,10,30, c+2)
+
+x = list(range(1,corridas+1))
+plt.subplot(1, 3, 1) #Para no tener que cerrar ventana por ventana, asi poder ver todos los graficos al instante
+plt.plot(x, maxGlobales)
+plt.title('Valor máximo por iteración')
+plt.xlabel('Iteración')
+plt.ylabel('Valor del mejor miembro')
+plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
+
+plt.subplot(1, 3, 2)
+plt.plot(x, minGlobales)
+plt.title('Valor minimo por iteración')
+plt.xlabel('Iteración')
+plt.ylabel('Valor del menor miembro')
+plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
+
+plt.subplot(1, 3, 3)
+plt.plot(x, promGlobales)
+plt.title('Valor promedio por iteración')
+plt.xlabel('Iteración')
+plt.ylabel('Valor del miembro promedio')
+plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
+
+plt.tight_layout()
+plt.show()
 
 #ALGUNAS FUNCIONES EXPLICADAS
 
