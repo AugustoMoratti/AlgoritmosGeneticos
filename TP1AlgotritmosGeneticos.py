@@ -42,7 +42,7 @@ def mutacion(seleccionados, i, tam):
     if cromo[pos] == 0:
         cromo[pos] = 1
     else :
-            cromo[pos] = 0
+        cromo[pos] = 0
     return cromo
 
 def crossover(seleccionados, i, tam):
@@ -119,13 +119,13 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr) :
     #     print(seleccionados[i])
     for i in range (cantMiembros//2): # la division // devuelve numero entero, mientras que / devuelve flotante
         cross = random.randint(1,100)
-        print("probabilidad de crossover en ",i, " :",cross)
+        #print("probabilidad de crossover en ",i, " :",cross)
         if cross <= PC*100:
             cambiados.extend(crossover(seleccionados, i, tamCromo)) #arreglo de los nuevos cromosomas
         else :
             arregloProvisorio = [seleccionados[i*2].cromosoma , seleccionados[(i*2)+1].cromosoma]
             cambiados.extend(arregloProvisorio)
-        print('COLECCION DE CAMBIADOS ', i, cambiados)
+        #print('COLECCION DE CAMBIADOS ', i, cambiados)
     for j in range(cantMiembros):
         muta = random.randint(1,100)
         #print("probabilidad de mutacion en ",j, " :",muta)
