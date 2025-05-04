@@ -32,9 +32,6 @@ def binarioToNumber(binario): #Convierte una lista de 1 y 0 (binario) a entero
         decimal = decimal + cromI[i] * (2**i)
     return decimal
 
-def torneo(iteraciones, poblacion):
-    ...
-    #devolver un arreglo de la cantidad especificada de miembros
 
 def mutacion(seleccionados, i, tam):
     cromo = seleccionados[i]
@@ -94,6 +91,24 @@ class Poblacion:
                 j = j + 1
             elegidos.append(self.miembros[j])
         return elegidos
+    
+    def torneo(self, cantidad):
+        elegidos = []
+        seleccionados = []
+        for i in range(cantidad):
+            j = 0
+            for j in range(cantidad):
+                numAleatorio = random.randint(0,cantidad-1)
+                elegidos.append(self.miembros[numAleatorio])
+            k = 0
+            for k in range(cantidad):
+                if k == 0:
+                    max = elegidos[0]
+                else:
+                    if max.funcionObjetivo < elegidos[k].funcionObjetivo :
+                        max = elegidos[k]
+            seleccionados.append(max)
+        return seleccionados
 
 
     def mostrar_miembros(self):
@@ -209,7 +224,7 @@ def createPoblationInicial(cantMiembros, tamCromo):
 minGlobales = []
 maxGlobales = []
 promGlobales = []
-corridas = 20
+corridas = 3
 population = createPoblationInicial(10,30) #se ingresa numero deseado de integrantes de la población y numero de bits por cromosoma
 for c in range(corridas-1):
     population = siguientePoblacion(population,10,30, c+2)
