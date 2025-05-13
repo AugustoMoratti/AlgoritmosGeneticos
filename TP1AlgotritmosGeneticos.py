@@ -51,8 +51,8 @@ def crossover(seleccionados, i, tam):
     #print(n)
     elemento1 = seleccionados[i*2]
     elemento2 = seleccionados[(i*2)+1]
-    elemento3 = elemento1.cromosoma[:n] + elemento2.cromosoma[n:]#devuelve el cromosoma cambiado
-    elemento4 = elemento2.cromosoma[:n] + elemento1.cromosoma[n:]#devuelve el cromosoma cambiado
+    elemento3 = elemento1[:n] + elemento2[n:]#devuelve el cromosoma cambiado
+    elemento4 = elemento2[:n] + elemento1[n:]#devuelve el cromosoma cambiado
     #print(elemento3)
     #print(elemento4)
     return [elemento3, elemento4]
@@ -92,7 +92,7 @@ class Poblacion:
             j = 0
             while self.miembros[j].valor != val:
                 j = j + 1
-            elegidos.append(self.miembros[j])
+            elegidos.append(self.miembros[j].cromosoma)
         return elegidos
 
 
@@ -119,13 +119,13 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr) :
     #     print(seleccionados[i])
     for i in range (cantMiembros//2): # la division // devuelve numero entero, mientras que / devuelve flotante
         cross = random.randint(1,100)
-        print("probabilidad de crossover en ",i, " :",cross)
+        #print("probabilidad de crossover en ",i, " :",cross)
         if cross <= PC*100:
             cambiados.extend(crossover(seleccionados, i, tamCromo)) #arreglo de los nuevos cromosomas
         else :
-            arregloProvisorio = [seleccionados[i*2].cromosoma , seleccionados[(i*2)+1].cromosoma]
+            arregloProvisorio = [seleccionados[i*2] , seleccionados[(i*2)+1]]
             cambiados.extend(arregloProvisorio)
-        print('COLECCION DE CAMBIADOS ', i, cambiados)
+        #print('COLECCION DE CAMBIADOS ', i, cambiados)
     for j in range(cantMiembros):
         muta = random.randint(1,100)
         #print("probabilidad de mutacion en ",j, " :",muta)
@@ -209,7 +209,7 @@ def createPoblationInicial(cantMiembros, tamCromo):
 minGlobales = []
 maxGlobales = []
 promGlobales = []
-corridas = 20
+corridas = 100
 population = createPoblationInicial(10,30) #se ingresa numero deseado de integrantes de la población y numero de bits por cromosoma
 for c in range(corridas-1):
     population = siguientePoblacion(population,10,30, c+2)
@@ -217,23 +217,23 @@ for c in range(corridas-1):
 x = list(range(1,corridas+1))
 plt.subplot(1, 3, 1) #Para no tener que cerrar ventana por ventana, asi poder ver todos los graficos al instante
 plt.plot(x, maxGlobales)
-plt.title('Valor máximo por iteración')
+plt.title('Fitness máximo por iteración')
 plt.xlabel('Iteración')
-plt.ylabel('Valor del mejor miembro')
-plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
+plt.ylabel('Fitness del mejor miembro')
+#plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
 
 plt.subplot(1, 3, 2)
 plt.plot(x, minGlobales)
-plt.title('Valor minimo por iteración')
+plt.title('Fitness minimo por iteración')
 plt.xlabel('Iteración')
-plt.ylabel('Valor del menor miembro')
+plt.ylabel('Fitness del menor miembro')
 plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
 
 plt.subplot(1, 3, 3)
 plt.plot(x, promGlobales)
-plt.title('Valor promedio por iteración')
+plt.title('Fitness promedio por iteración')
 plt.xlabel('Iteración')
-plt.ylabel('Valor del miembro promedio')
+plt.ylabel('Fitness promedio')
 plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
 
 plt.tight_layout()
