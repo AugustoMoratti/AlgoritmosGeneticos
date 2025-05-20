@@ -86,6 +86,7 @@ class Poblacion:
             print("ERROR: CANTIDAD DE POSICIONES DE RULETA ERRONEA")
         for i in range(cantidad):
             pos = random.randint(0,99)
+            print("Pos ruletav = ", pos)
             #print ("elegido: ",roulette[pos])
             val = roulette[pos]
             j = 0
