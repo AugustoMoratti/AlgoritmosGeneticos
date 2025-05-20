@@ -44,6 +44,7 @@ def mutacion(seleccionados, i, tam):
 
 def crossover(seleccionados, i, tam):
     n = random.randint(0,tam-1)
+    print("Corte crossover = ", n)
     #print("n crossover :")
     #print(n)
     elemento1 = seleccionados[i*2]
@@ -79,6 +80,7 @@ class Poblacion:
             cantPos = self.miembros[j].fitness
             for k in range(int(cantPos*100)):
                 roulette.append(self.miembros[j].valor)
+        print("Ruleta = ", roulette)
         #print("RULETA: ",roulette)
         if len(roulette)!=100:
             print("ERROR: CANTIDAD DE POSICIONES DE RULETA ERRONEA")
@@ -121,19 +123,23 @@ class Poblacion:
         print(num, "       : ", self.crommax," : ", self.max," : ", self.min," : ", self.prom)
 
 def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr) :
-    PC = 0.75
-    PM = 0.05
+    PC = 1
+    PM = -1
     suma = 0
     acumFitness = 0
     fObj = 0
     miembros = []
     cambiados = [] 
     seleccionados = poblacion.ruleta(cantMiembros)
+    print("Seleccionados =")
+    for x in range(cantMiembros):
+        print(seleccionados[x])
     # print("CROMOSOMAS SELECCIONADOS: ")
     # for i in range(cantMiembros):
     #     print(seleccionados[i])
     for i in range (cantMiembros//2): # la division // devuelve numero entero, mientras que / devuelve flotante
         cross = random.randint(1,100)
+        print("Cross = ", cross)
         #print("probabilidad de crossover en ",i, " :",cross)
         if cross <= PC*100:
             cambiados.extend(crossover(seleccionados, i, tamCromo)) #arreglo de los nuevos cromosomas
@@ -148,6 +154,9 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr) :
             cambiados[j] = (mutacion(cambiados, j, tamCromo))
     #     print('COLECCION DE CAMBIADOS ', j, cambiados)
     # print(cambiados)
+    print("Pasados por crossover = ")
+    for t in range(cantMiembros):
+        print(cambiados[t])
     for k in range(cantMiembros) :
         valor = binarioToNumber(cambiados[k])
         fObj = funcion(valor)
@@ -224,10 +233,10 @@ def createPoblationInicial(cantMiembros, tamCromo):
 minGlobales = []
 maxGlobales = []
 promGlobales = []
-corridas = 100
-population = createPoblationInicial(10,30) #se ingresa numero deseado de integrantes de la población y numero de bits por cromosoma
+corridas = 2
+population = createPoblationInicial(6,30) #se ingresa numero deseado de integrantes de la población y numero de bits por cromosoma
 for c in range(corridas-1):
-    population = siguientePoblacion(population,10,30, c+2)
+    population = siguientePoblacion(population,6,30, c+2)
 
 x = list(range(1,corridas+1))
 plt.subplot(1, 3, 1) #Para no tener que cerrar ventana por ventana, asi poder ver todos los graficos al instante
