@@ -136,7 +136,8 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr) :
         cross = random.randint(1,100)
         #print("probabilidad de crossover en ",i, " :",cross)
         if cross <= PC*100:
-            cambiados.extend(crossover(seleccionados, i, tamCromo)) #arreglo de los nuevos cromosomas
+            crossoverAplied = crossover(seleccionados, i, tamCromo)
+            cambiados.extend(crossoverAplied) #arreglo de los nuevos cromosomas
         else :
             arregloProvisorio = [seleccionados[i*2] , seleccionados[(i*2)+1]]
             cambiados.extend(arregloProvisorio)
@@ -224,7 +225,7 @@ def createPoblationInicial(cantMiembros, tamCromo):
 minGlobales = []
 maxGlobales = []
 promGlobales = []
-corridas = 20
+corridas = 100
 population = createPoblationInicial(10,30) #se ingresa numero deseado de integrantes de la población y numero de bits por cromosoma
 for c in range(corridas-1):
     population = siguientePoblacion(population,10,30, c+2)
