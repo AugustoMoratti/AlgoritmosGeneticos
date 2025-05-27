@@ -9,7 +9,7 @@ def generacionDeCromosoma(tam):
 
 
 def funcion(x):
-    coef = 2**30-1
+    coef = (2**30)-1
     a = (x/coef)**2
     return a
 
@@ -22,7 +22,7 @@ def numberToBinario(number):
     if len(binario)!=30:
         for i in range(30-len(binario)):
             binario.append(0)
-    crom = binario[::-1]
+    crom = binario[::-1] #para invertir listas
     return crom
 
 def binarioToNumber(binario): #Convierte una lista de 1 y 0 (binario) a entero
@@ -224,33 +224,24 @@ def createPoblationInicial(cantMiembros, tamCromo):
 minGlobales = []
 maxGlobales = []
 promGlobales = []
-corridas = 100
+corridas = 20
 population = createPoblationInicial(10,30) #se ingresa numero deseado de integrantes de la población y numero de bits por cromosoma
 for c in range(corridas-1):
     population = siguientePoblacion(population,10,30, c+2)
 
-x = list(range(1,corridas+1))
-plt.subplot(1, 3, 1) #Para no tener que cerrar ventana por ventana, asi poder ver todos los graficos al instante
-plt.plot(x, maxGlobales)
-plt.title('Fitness máximo por iteración')
-plt.xlabel('Iteración')
-plt.ylabel('Fitness del mejor miembro')
-#plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
+x = list(range(1, corridas + 1))
 
-plt.subplot(1, 3, 2)
-plt.plot(x, minGlobales)
-plt.title('Fitness minimo por iteración')
+plt.plot(x, maxGlobales, label='Fitness máximo')
+plt.plot(x, minGlobales, label='Fitness mínimo')
+plt.plot(x, promGlobales, label='Fitness promedio')
+
+plt.title('Evolución del fitness por iteración')
 plt.xlabel('Iteración')
-plt.ylabel('Fitness del menor miembro')
+plt.ylabel('Fitness')
 plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
 
-plt.subplot(1, 3, 3)
-plt.plot(x, promGlobales)
-plt.title('Fitness promedio por iteración')
-plt.xlabel('Iteración')
-plt.ylabel('Fitness promedio')
-plt.ylim(0, 1)  # Escala del eje Y de 0 a 1
-
+plt.legend()  # Muestra la leyenda con las etiquetas
+plt.grid(True)  # Opcional: muestra una grilla para facilitar la lectura
 plt.tight_layout()
 plt.show()
 
