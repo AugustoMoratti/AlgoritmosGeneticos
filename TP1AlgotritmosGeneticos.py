@@ -107,7 +107,7 @@ class Poblacion:
                 else:
                     if max.funcionObjetivo < elegidos[k].funcionObjetivo :
                         max = elegidos[k]
-            seleccionados.append(max)
+            seleccionados.append(max.cromosoma)
         return seleccionados
 
 
