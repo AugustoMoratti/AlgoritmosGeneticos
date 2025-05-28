@@ -1,6 +1,7 @@
 import random
 import matplotlib.pyplot as plt
 
+
 def generacionDeCromosoma(tam):
     a = []
     for i in range(tam):
@@ -13,6 +14,7 @@ def funcion(x):
     a = (x/coef)**2
     return a
 
+
 def numberToBinario(number):
     binario = []
     while number != 0:
@@ -24,6 +26,7 @@ def numberToBinario(number):
             binario.append(0)
     crom = binario[::-1] #para invertir listas
     return crom
+
 
 def binarioToNumber(binario): #Convierte una lista de 1 y 0 (binario) a entero
     cromI = binario[::-1]
@@ -42,6 +45,7 @@ def mutacion(seleccionados, i, tam):
         cromo[pos] = 0
     return cromo
 
+
 def crossover(seleccionados, i, tam):
     n = random.randint(0,tam-1)
     #print("n crossover :")
@@ -54,6 +58,7 @@ def crossover(seleccionados, i, tam):
     #print(elemento4)
     return [elemento3, elemento4]
 
+
 class Miembro:
     def __init__(self, cromosoma, valor, suma):
           self.cromosoma = cromosoma
@@ -63,6 +68,7 @@ class Miembro:
 
     def __str__(self):
         return f"Cromosoma: {self.cromosoma} Valor: {self.valor} FuncionObj: {self.funcionObjetivo} fitness: {self.fitness} "
+
 
 class Poblacion:
     def __init__(self, miembros, cromMax, max, min, promedio):
