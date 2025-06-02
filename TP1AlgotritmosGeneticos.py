@@ -218,11 +218,12 @@ def createPoblationInicial(cantMiembros, tamCromo):
     pob.mostrarPoblacion(1)
     return pob
 
-minGlobales = []
-maxGlobales = []
-promGlobales = []
+
 opcion = " "
 while opcion != "s" :
+    minGlobales = []
+    maxGlobales = []
+    promGlobales = []
     print("=" * 40)
     print("|{:^38}|".format("Elija un método de selección"))
     print("=" * 40)
@@ -263,6 +264,8 @@ while opcion != "s" :
         plt.grid(True)  # Opcional: muestra una grilla para facilitar la lectura
         plt.tight_layout()
         plt.show()
+if opcion == "s":
+    print("Nos vemos la proxima!s")
 
 
 
