@@ -1,5 +1,7 @@
 import random
 import matplotlib.pyplot as plt
+from openpyxl import Workbook
+import time
 
 
 def generacionDeCromosoma(tam):
@@ -135,6 +137,8 @@ class Poblacion:
             print(miembro)
 
     def mostrarPoblacion(self, num):
+        linea = [num, str(self.crommax), self.max, self.min, self.prom]
+        ws.append(linea)
         print(num, "       : ", self.crommax," : ", self.max," : ", self.min," : ", self.prom)
 
 def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr, metodo) :
@@ -178,7 +182,9 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr, metodo) :
             if max < fObj :
                 max = fObj
                 posmax = k
-        miembros.append(Miembro(cambiados[k], valor, suma))
+    for y in range(cantMiembros):
+        valor = binarioToNumber(cambiados[y])
+        miembros.append(Miembro(cambiados[y], valor, suma))
     pob = Poblacion(miembros, cambiados[posmax], max, min, suma/cantMiembros) #El promedio es suma/cantMiembros (estaba mal antes, suma/tamCromo)
     minGlobales.append(min)
     maxGlobales.append(max)
@@ -207,13 +213,13 @@ def createPoblationInicial(cantMiembros, tamCromo):
             if max < fObj :
                 max = fObj
                 posmax = i
-        miembros.append(Miembro(cromosomas[i], valor, suma))
+    for y in range(cantMiembros):
+        valor = binarioToNumber(cromosomas[y])
+        miembros.append(Miembro(cromosomas[y], valor, suma))
     pob = Poblacion(miembros, cromosomas[posmax], max, min, suma/cantMiembros)
     minGlobales.append(min)
     maxGlobales.append(max)
     promGlobales.append(suma/cantMiembros)
-    print('Los miembros de la población inicial son:')
-    pob.mostrar_miembros()
     print(" POBLACIÓN : CROMOSOMA CORRESPONDIENTE A VALOR MÁXIMO                                                    : MAX    : MIN    : PROM ") 
     pob.mostrarPoblacion(1)
     return pob
@@ -243,11 +249,20 @@ while opcion != "s" :
             corridas = int(input("Ingresá la cantidad de iteraciones: "))
         except ValueError:
             print("Eso no es un número entero válido.")
+        
+        #Creación de excel
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Datos de población"
+        ws.append(["POBLACIÓN", "CROMOSOMA CORRESPONDIENTE A VALOR MÁXIMO", "MÁXIMO", "MÍNIMO", "PROMEDIO"])
+        ###
 
         population = createPoblationInicial(10,30) 
 
         for c in range(corridas-1):
             population = siguientePoblacion(population,10,30, c+2, opcion)
+
+        wb.save(f"datos_poblacion_{int(time.time())}.xlsx")
 
         x = list(range(1, corridas + 1))
 
@@ -263,9 +278,10 @@ while opcion != "s" :
         plt.legend()  # Muestra la leyenda con las etiquetas
         plt.grid(True)  # Opcional: muestra una grilla para facilitar la lectura
         plt.tight_layout()
+        plt.savefig(f"grafica_datos_poblacion_metodo{str(opcion)}_{int(time.time())}.png")  #PARA GUARDAR
         plt.show()
 if opcion == "s":
-    print("Nos vemos la proxima!s")
+    print("Nos vemos la próxima!")
 
 
 
