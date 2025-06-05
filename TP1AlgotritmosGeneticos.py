@@ -153,9 +153,9 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr, metodo) :
     elif metodo == "b":
         seleccionados = poblacion.torneo(cantMiembros)
     elif metodo == "c":
-        cambiados.extend(poblacion.elitismo(cantMiembros))
         cantMiembros = cantMiembros - 2
         seleccionados = poblacion.ruleta(cantMiembros)
+        cambiados.extend(poblacion.elitismo(cantMiembros))
     for i in range (cantMiembros//2): # la division // devuelve numero entero, mientras que / devuelve flotante
         cross = random.randint(1,100)
         if cross <= PC*100:
