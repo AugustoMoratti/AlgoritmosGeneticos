@@ -1,0 +1,28 @@
+*/la ruleta se puede hacer con vectores o un acumulado(tiras numeros aleatorios de 0 a 1 , le suma el fitness)
+quieren que hagamos la ruleta y no usemos metoso ya sea acumulada o vectorrr
+
+crossover
+tengo los vectores padres e hijos, tiro num aleatorio y me da el lugar donde se realiza el cortee.
+75% de las veces se hace 
+tiro num aleatorio entre 0 y 1 si me da mayor a 0.75 no hago crossover si me da menos hago crossover (se hace igual con l amutacion pero con aprox un 5%)
+
+mutacion
+tiro num random y donde me da en esa posicion hago la mutacion    
+
+La notta es individual del coloquio /* Ñ
+
+Metodo de torneo
+una lucha de individuos generalmente 40% de la poblacion que tenemos
+elegir el 40% de fornma aleatoria y van a luchar los padres entre si y gana el de mejor fitness y para el otro padre haces lo mismo
+
+Elitismo
+puede aplicarse a los 2 metodos , obligatorio aplicarlo a la ruleta
+20% de los individuos mejores pasan a la siguiente poblacion sin hacerles nada
+con el 80% hacemos la poblacion siguiente
+en la grafica se ve q el maximo nunca va a ser menor que la poblacion anterior
+
+no macro para ruleta torneo crossover
+
+nos quedamos con el i max y el promedio de cada ciclo para ir analizando  )max prom, min y el cromosoma que dio el max
+
+hay que variar 2 parametros y ver como afecta al programa y sus resultados
