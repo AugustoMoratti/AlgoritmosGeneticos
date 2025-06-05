@@ -6,7 +6,7 @@ tengo los vectores padres e hijos, tiro num aleatorio y me da el lugar donde se 
 75% de las veces se hace 
 tiro num aleatorio entre 0 y 1 si me da mayor a 0.75 no hago crossover si me da menos hago crossover (se hace igual con l amutacion pero con aprox un 5%)
 
-mutacion
+holas
 tiro num random y donde me da en esa posicion hago la mutacion    
 
 La notta es individual del coloquio /* Ñ
