@@ -143,7 +143,7 @@ class Poblacion:
         print(num, "       : ", self.crommax," : ", self.max," : ", self.min," : ", self.prom)
 
 def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr, metodo) :
-    PC = 0.75
+    PC = 0.1
     PM = 0.05
     pasoPorElitismo = 0
     suma = 0
@@ -156,7 +156,6 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr, metodo) :
         seleccionados = poblacion.torneo(cantMiembros)
     elif metodo == "c":
         pasoPorElitismo = 1
-        cambiados.extend(poblacion.elitismo(cantMiembros))
         cMiembros = cantMiembros - 2
         seleccionados = poblacion.ruleta(cMiembros)
         for i in range (cMiembros//2): # la division // devuelve numero entero, mientras que / devuelve flotante
@@ -171,7 +170,8 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr, metodo) :
             muta = random.randint(1,100)
             if muta <= PM*100:
                 cambiados[j] = (mutacion(cambiados, j, tamCromo))
-        for k in range(cMiembros) :
+        cambiados.extend(poblacion.elitismo(cantMiembros))
+        for k in range(cantMiembros) :
             valor = binarioToNumber(cambiados[k])
             fObj = funcion(valor)
             suma = suma + fObj
