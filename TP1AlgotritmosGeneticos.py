@@ -115,6 +115,7 @@ class Poblacion:
     def elitismo(self, cant):
         maximos = []
         posmax = -1
+        i = 0
         for j in range(2):
             for i in range (cant):
                 if i == posmax :
@@ -144,6 +145,7 @@ class Poblacion:
 def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr, metodo) :
     PC = 0.75
     PM = 0.05
+    pasoPorElitismo = 0
     suma = 0
     fObj = 0
     miembros = []
@@ -153,35 +155,63 @@ def siguientePoblacion(poblacion, cantMiembros, tamCromo, numCorr, metodo) :
     elif metodo == "b":
         seleccionados = poblacion.torneo(cantMiembros)
     elif metodo == "c":
+        pasoPorElitismo = 1
         cambiados.extend(poblacion.elitismo(cantMiembros))
-        cantMiembros = cantMiembros - 2
-        seleccionados = poblacion.ruleta(cantMiembros)
-    for i in range (cantMiembros//2): # la division // devuelve numero entero, mientras que / devuelve flotante
-        cross = random.randint(1,100)
-        if cross <= PC*100:
-            crossoverAplied = crossover(seleccionados, i, tamCromo)
-            cambiados.extend(crossoverAplied) #arreglo de los nuevos cromosomas
-        else :
-            arregloProvisorio = [seleccionados[i*2] , seleccionados[(i*2)+1]]
-            cambiados.extend(arregloProvisorio)
-    for j in range(cantMiembros):
-        muta = random.randint(1,100)
-        if muta <= PM*100:
-            cambiados[j] = (mutacion(cambiados, j, tamCromo))
-    for k in range(cantMiembros) :
-        valor = binarioToNumber(cambiados[k])
-        fObj = funcion(valor)
-        suma = suma + fObj
-        if k == 0 :
-            min = fObj
-            max = fObj
-            posmax = k
-        else :
-            if min > fObj : 
+        cMiembros = cantMiembros - 2
+        seleccionados = poblacion.ruleta(cMiembros)
+        for i in range (cMiembros//2): # la division // devuelve numero entero, mientras que / devuelve flotante
+            cross = random.randint(1,100)
+            if cross <= PC*100:
+                crossoverAplied = crossover(seleccionados, i, tamCromo)
+                cambiados.extend(crossoverAplied) #arreglo de los nuevos cromosomas
+            else :
+                arregloProvisorio = [seleccionados[i*2] , seleccionados[(i*2)+1]]
+                cambiados.extend(arregloProvisorio)
+        for j in range(cMiembros):
+            muta = random.randint(1,100)
+            if muta <= PM*100:
+                cambiados[j] = (mutacion(cambiados, j, tamCromo))
+        for k in range(cMiembros) :
+            valor = binarioToNumber(cambiados[k])
+            fObj = funcion(valor)
+            suma = suma + fObj
+            if k == 0 :
                 min = fObj
-            if max < fObj :
                 max = fObj
                 posmax = k
+            else :
+                if min > fObj : 
+                    min = fObj
+                if max < fObj :
+                    max = fObj
+                    posmax = k
+    if pasoPorElitismo == 0 :
+        for i in range (cantMiembros//2): # la division // devuelve numero entero, mientras que / devuelve flotante
+            cross = random.randint(1,100)
+            if cross <= PC*100:
+                crossoverAplied = crossover(seleccionados, i, tamCromo)
+                cambiados.extend(crossoverAplied) #arreglo de los nuevos cromosomas
+            else :
+                arregloProvisorio = [seleccionados[i*2] , seleccionados[(i*2)+1]]
+                cambiados.extend(arregloProvisorio)
+        for j in range(cantMiembros):
+            muta = random.randint(1,100)
+            if muta <= PM*100:
+                cambiados[j] = (mutacion(cambiados, j, tamCromo))
+        for k in range(cantMiembros) :
+            valor = binarioToNumber(cambiados[k])
+            fObj = funcion(valor)
+            suma = suma + fObj
+            if k == 0 :
+                min = fObj
+                max = fObj
+                posmax = k
+            else :
+                if min > fObj : 
+                    min = fObj
+                if max < fObj :
+                    max = fObj
+                    posmax = k
     for y in range(cantMiembros):
         valor = binarioToNumber(cambiados[y])
         miembros.append(Miembro(cambiados[y], valor, suma))
